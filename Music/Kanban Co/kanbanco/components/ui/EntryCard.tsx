@@ -1,55 +1,97 @@
-import React from 'react'
-import styles from './styles.module.css'
-import { DraggableCardBody } from '@/components/ui/draggable-card'
- 
+"use client"; 
+
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
-export interface CardDemoProps {
-  label?: string
-  title: string
-  description?: string
-  
-}
+import { ArrowLeftIcon } from "lucide-react"
+import { input } from 'motion/react-client';
 
-// c
+type Card = {
+  id: string; 
+  title: string;
+};
 
+type Column = {
+  id: string;
+  title: string;
+  cards: Card[];
+};
 
+export default function KanbanBoard() {
+ const [columns, setColumns] = useState<Column[]>([
+    { id: 'col-1', title: 'To Do', cards: [] },
+    { id: 'col-2', title: 'In Progress', cards: [] },
+    { id: 'col-3', title: 'Done', cards: [] },
+  ]);
 
+  const addCard = (columnId: string) => {
+    const newCard = {
+      id: crypto.randomUUID(), 
+      title: <input type="text" name="" id="" />
+    };
 
-export function CardDemo() {
+    setColumns((prev) =>
+      prev.map((col) => {
+        if (col.id === columnId) {
+          return { ...col, cards: [...col.cards, newCard] };
+        }
+        return col;
+      })
+    );
+  };
+
+  const removeCard = (columnId: string, cardId: string) => {
+    console.log("Clicked")
+    setColumns((prev) =>
+      prev.map((col) => {
+        if (col.id === columnId) {
+          console.log("colId>>>", col.id)
+          
+          return { ...col, cards: col.cards.filter((card) => card.id !== cardId) };
+        }
+        return col;
+      })
+    );
+  }
+
   return (
-    <>
-    <div className="flex flex-col items-center justify-start pt-10 gap-6">
+    <div className="flex flex-row gap-6 overflow-x-auto p-4 h-full w-full">
+      {columns.map((col) => (
+        <div 
+          key={col.id} 
+          className="min-w-[300px] bg-gray-100 dark:bg-gray-900 rounded-lg p-4 flex flex-col gap-4 shadow-sm"
+        >
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-2">
+            <h2 className="font-bold text-gray-700 dark:text-gray-200">
+              {col.title}
+            </h2>
+            <span className="text-xs text-gray-400 bg-gray-200 dark:bg-gray-800 px-2 py-1 rounded-full">
+              {col.cards.length}
+            </span>
+          </div>
 
-  <Button className='ml-64 absolute mb-120'>+</Button>
+          <div className="flex flex-col gap-3 flex-1 overflow-y-auto min-h-[100px]">
+            {col.cards.map((card) => (
+              <div 
+                key={card.id} 
+                className="bg-white dark:bg-gray-800 p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700 hover:border-blue-400 transition-colors cursor-pointer"
+              >
+                {card.title}
+              </div>
+            ))}
+          </div>
 
-  <Card className="w-80  mb-120 bg-gray-100 dark:bg-gray-800">
-    <CardHeader className="flex flex-col items-center"> 
-      <CardTitle className="text-xl">Create Card</CardTitle>
-      <CardDescription>
-        Create Card name and description here.
-      </CardDescription>
-    </CardHeader>
-    
-    <CardContent>
-      <form>
-        <div className="flex flex-col gap-6">
+          <button
+            onClick={() => addCard(col.id)}
+            className="w-full py-2 mt-auto  border-gray-300 dark:border-gray-700 text-gray-500 rounded-lg hover:bg-white dark:hover:bg-gray-800 hover:text-blue-500 transition-all text-sm font-medium"
+          >
+            + Add Card
+          </button>
+
+           <button className=" hover:text-blue-500 transition-all text-sm font-medium" variant="outline" size="icon" aria-label="Go Back" onClick={() => removeCard(col.id, col.cards[col.cards.length -1]?.id )}>
+          <ArrowLeftIcon /> </button>
         </div>
-      </form>
-    </CardContent>
-  </Card>
-</div>
-    </>
-  )
+      ))}
+    </div>
+  );
 }
