@@ -1,6 +1,6 @@
 import React from 'react'
-import Image from "next/image"
 import styles from './styles.module.css'
+import { DraggableCardBody } from '@/components/ui/draggable-card'
  
 import { Button } from "@/components/ui/button"
 import {
@@ -15,40 +15,41 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+export interface CardDemoProps {
+  label?: string
+  title: string
+  description?: string
+  
+}
+
+// c
+
+
+
+
 export function CardDemo() {
   return (
-    <Card className="w-full max-w-sm ml-24 mb-32">
-      <CardHeader>
-        <CardTitle>Create Card</CardTitle>
-        <CardDescription>
-          Create Card name and description here.
-        </CardDescription>
-        <CardAction>
-          <Button variant="link">Add Card</Button>
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Card Name</Label>
-              <Input
-                title="string"
-                type="email"
-                placeholder="Backlog"
-                required
-              />
-            </div>
-            
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Create 
-        </Button>
-        
-      </CardFooter>
-    </Card>
+    <>
+    <div className="flex flex-col items-center justify-start pt-10 gap-6">
+
+  <Button className='ml-64 absolute mb-120'>+</Button>
+
+  <Card className="w-80  mb-120 bg-gray-100 dark:bg-gray-800">
+    <CardHeader className="flex flex-col items-center"> 
+      <CardTitle className="text-xl">Create Card</CardTitle>
+      <CardDescription>
+        Create Card name and description here.
+      </CardDescription>
+    </CardHeader>
+    
+    <CardContent>
+      <form>
+        <div className="flex flex-col gap-6">
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+</div>
+    </>
   )
 }
