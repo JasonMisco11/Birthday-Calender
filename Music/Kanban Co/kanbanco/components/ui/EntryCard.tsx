@@ -27,7 +27,9 @@ export default function KanbanBoard() {
   ]);
   const [inputValues, setInputValues] = useState({});
 
+
   const addCard = (columnId: string) => {
+    console.log("called for columnId>>:", columnId);
     const newCard = {
       id: crypto.randomUUID(),
       // title: <input type="text" name="" id="" />
@@ -36,10 +38,10 @@ export default function KanbanBoard() {
 
     console.log("new card>>", newCard);
 
-    setColumns((prev) =>
-      prev.map((col) => {
+
+   const consolidatedItems=  columns.map((col) => {
         if (col.id === columnId) {
-          console.log("col id>>", col.id, "column id>>", columnId);
+          console.log("col id>>",columnId);
           // col.cards.push(newCard);
           console.log("col.cards>>", col.cards);
           return { ...col, cards: [...col.cards, newCard] };
@@ -48,27 +50,16 @@ export default function KanbanBoard() {
         console.log("input value>>>>", inputValues, col);
         return col;
       })
-    );
+    setColumns(consolidatedItems)
+   
   };
 
-  const removeCard = (currentColumnId: string) => {
-    const columnIndex = columns.findIndex((col) => col.id === currentColumnId);
 
-    if (columnIndex <= 0) return;
+// filter out the cloumn and get back the remaining columns from the array
 
-    const cards = columns[columnIndex].cards;
-    if (cards.length === 0) return;
 
-    const cardToMove = cards[cards.length - 1];
 
-    const updatedColumns = [...columns];
 
-    updatedColumns[columnIndex].cards = cards.slice(0, -1);
-
-    updatedColumns[columnIndex - 1].cards.push(cardToMove);
-
-    setColumns(updatedColumns);
-  };
 
   const moveCardRight = (cardId: string, fromColumnId: string) => {
     console.log(
@@ -88,6 +79,10 @@ export default function KanbanBoard() {
     );
     if (cardIndex === -1) return;
     const cardToMove = columns[fromColumnIndex].cards[cardIndex];
+    if(!cardToMove.title){
+        alert("Please enter a title before moving the card.");
+        return;
+    }
 
     const updatedColumns = [...columns];
     updatedColumns[fromColumnIndex].cards.splice(cardIndex, 1);
@@ -104,6 +99,10 @@ export default function KanbanBoard() {
     );
     if (cardIndex === -1) return;
     const cardToMove = columns[fromColumnIndex].cards[cardIndex];
+    if(!cardToMove.title){
+        alert("Please enter a title before moving the card.");
+        return;
+    }
     const updatedColumns = [...columns];
     updatedColumns[fromColumnIndex].cards.splice(cardIndex, 1);
     updatedColumns[toColumnIndex].cards.push(cardToMove);
@@ -133,7 +132,7 @@ export default function KanbanBoard() {
 
   return (
     <div className="flex flex-row gap-6 overflow-x-auto p-4 h-full w-full">
-      {columns.map((col) => (
+      {columns.map((col,colIndex) => (
         <div
           key={col.id}
           className="min-w-[300px] bg-gray-100 dark:bg-gray-900 rounded-lg p-4 flex flex-col gap-4 shadow-sm"
@@ -187,12 +186,12 @@ export default function KanbanBoard() {
             ))}
           </div>
 
-          <button
+         {colIndex == 0 && <button
             onClick={() => addCard(col.id)}
-            className="w-full py-2 mt-auto  border-gray-300 dark:border-gray-700 text-gray-500 rounded-lg hover:bg-white dark:hover:bg-gray-800 hover:text-blue-500 transition-all text-sm font-medium"
+            className="w-80 py-0 absolute z-100 mb-1 mr-8  text-gray-500 rounded-lg hover:text-blue-500 transition-all text-sm font-medium cursor-pointer"
           >
-            + Add Card
-          </button>
+            <span className="text-xl">＋</span>
+          </button>} 
           <button
             className=" hover:text-blue-500 transition-all text-sm font-medium"
             // variant="outline"
@@ -200,10 +199,16 @@ export default function KanbanBoard() {
             aria-label="Go Back"
             onClick={() => removeCard(col.id)}
           >
-            <ArrowLeftIcon />{" "}
           </button>
+
         </div>
+
       ))}
+
     </div>
+
   );
+
 }
+
+
