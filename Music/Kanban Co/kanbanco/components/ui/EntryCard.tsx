@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import { ArrowLeftIcon } from "lucide-react";
-import { input } from "motion/react-client";
+import { col, input } from "motion/react-client";
+import { IoIosArrowRoundForward } from "react-icons/io";
+import { TbArrowNarrowLeftDashed } from "react-icons/tb";
 
 type Card = {
   id: string;
@@ -19,10 +21,11 @@ type Column = {
 
 export default function KanbanBoard() {
   const [columns, setColumns] = useState<Column[]>([
-    { id: "col-1", title: "To Do", cards: [] },
-    { id: "col-2", title: "In Progress", cards: [] },
-    { id: "col-3", title: "Done", cards: [] },
+    { id: "col-1", title: "Stage 1", cards: [] },
+    { id: "col-2", title: "Stage 2", cards: [] },
+    { id: "col-3", title: "Stage 3", cards: [] },
   ]);
+  const [inputValues, setInputValues] = useState({});
 
   const addCard = (columnId: string) => {
     const newCard = {
@@ -31,11 +34,18 @@ export default function KanbanBoard() {
       title: "",
     };
 
+    console.log("new card>>", newCard);
+
     setColumns((prev) =>
       prev.map((col) => {
         if (col.id === columnId) {
+          console.log("col id>>", col.id, "column id>>", columnId);
+          // col.cards.push(newCard);
+          console.log("col.cards>>", col.cards);
           return { ...col, cards: [...col.cards, newCard] };
         }
+        // setInputValue("");
+        console.log("input value>>>>", inputValues, col);
         return col;
       })
     );
@@ -60,6 +70,67 @@ export default function KanbanBoard() {
     setColumns(updatedColumns);
   };
 
+  const moveCardRight = (cardId: string, fromColumnId: string) => {
+    console.log(
+      "moveCardRight called with cardId:",
+      cardId,
+      "fromColumnId:",
+      fromColumnId
+    );
+    const fromColumnIndex = columns.findIndex((col) => col.id === fromColumnId);
+    console.log("fromColumnIndex:", fromColumnIndex);
+    if (fromColumnIndex === -1 || fromColumnIndex === columns.length - 1)
+      return;
+    const toColumnIndex = fromColumnIndex + 1;
+
+    const cardIndex = columns[fromColumnIndex].cards.findIndex(
+      (card) => card.id === cardId
+    );
+    if (cardIndex === -1) return;
+    const cardToMove = columns[fromColumnIndex].cards[cardIndex];
+
+    const updatedColumns = [...columns];
+    updatedColumns[fromColumnIndex].cards.splice(cardIndex, 1);
+    updatedColumns[toColumnIndex].cards.push(cardToMove);
+    setColumns(updatedColumns);
+  };
+
+  const moveCardLeft = (cardId: string, fromColumnId: string) => {
+    const fromColumnIndex = columns.findIndex((col) => col.id === fromColumnId);
+    if (fromColumnIndex <= 0) return;
+    const toColumnIndex = fromColumnIndex - 1;
+    const cardIndex = columns[fromColumnIndex].cards.findIndex(
+      (card) => card.id === cardId
+    );
+    if (cardIndex === -1) return;
+    const cardToMove = columns[fromColumnIndex].cards[cardIndex];
+    const updatedColumns = [...columns];
+    updatedColumns[fromColumnIndex].cards.splice(cardIndex, 1);
+    updatedColumns[toColumnIndex].cards.push(cardToMove);
+    setColumns(updatedColumns);
+  };
+
+  const handleInputChange = (e, cardId) => {
+    const newInputValues = { ...inputValues, [cardId]: e.target.value }; // Update the specific card's value
+    setInputValues(newInputValues);
+
+    // columns.forEach((col) => {
+    //   col.cards.forEach((card) => {
+    //     setInputValue(e.target.value, card.id);
+    //     card.title = e.target.value;
+    //     console.log("card title>>", card.title, "card id>>", card.id);
+    //   })
+    // });
+
+    columns.forEach((col) => {
+      col.cards.forEach((card) => {
+        if (card.id === cardId) {
+          card.title = e.target.value;
+        }
+      });
+    });
+  };
+
   return (
     <div className="flex flex-row gap-6 overflow-x-auto p-4 h-full w-full">
       {columns.map((col) => (
@@ -80,9 +151,38 @@ export default function KanbanBoard() {
             {col.cards.map((card) => (
               <div
                 key={card.id}
-                className="bg-white dark:bg-gray-800 p-4 rounded shadow-sm border border-gray-200 dark:border-gray-700 hover:border-blue-400 transition-colors cursor-pointer"
+                className="bg-white flex items-center justify-between dark:bg-gray-800 py-4 px-2 rounded shadow-sm border border-gray-200 dark:border-gray-700 hover:border-blue-400 transition-colors cursor-pointer"
               >
-                {card.title}
+                {col.id != "col-1" && (
+                  <button
+                    className=" hover:text-blue-500 transition-all text-sm font-medium"
+                    // variant="outline"
+                    // size="icon"
+                    aria-label="Go Back"
+                    onClick={() => moveCardLeft(card.id, col.id)}
+                  >
+                    <TbArrowNarrowLeftDashed size={25} />
+                  </button>
+                )}
+
+                <input
+                  type="text"
+                  value={inputValues[card.id] || ""}
+                  onChange={(e) => handleInputChange(e, card.id)}
+                  className="p-1"
+                />
+
+                {col.id != "col-3" && (
+                <button
+                  className=" hover:text-blue-500 transition-all text-sm font-medium"
+                  // variant="outline"
+                  // size="icon"
+                  aria-label="Go Back"
+                  onClick={() => moveCardRight(card.id, col.id)}
+                >
+                  <IoIosArrowRoundForward size={25} />
+                </button>
+                )}
               </div>
             ))}
           </div>
@@ -93,11 +193,10 @@ export default function KanbanBoard() {
           >
             + Add Card
           </button>
-
           <button
             className=" hover:text-blue-500 transition-all text-sm font-medium"
-            variant="outline"
-            size="icon"
+            // variant="outline"
+            // size="icon"
             aria-label="Go Back"
             onClick={() => removeCard(col.id)}
           >
