@@ -1,0 +1,38 @@
+---
+
+title: Installation
+description: How to install and set up the calendar application in your project using the custom ShadCN UI registry
+icon: Rocket
+
+---
+
+Use your preferred package manager to install the calendar component directly from the custom ShadCN UI registry:
+
+```npm
+npx shadcn@latest add "https://calendar.jeraidi.tech/r/full-calendar.json"
+```
+
+## Example Usage
+
+Inside your `app/page.tsx`:
+
+```tsx
+import React, { Suspense } from "react";
+import { Calendar } from "@/components/calendar/calendar";
+import { CalendarSkeleton } from "@/components/calendar/skeletons/calendar-skeleton";
+
+export default function CalendarPage() {
+  return (
+    <Suspense fallback={<CalendarSkeleton />}>
+      <Calendar />
+    </Suspense>
+  );
+}
+```
+
+> ✅ Visit your app at: `http://localhost:3000/`
+
+## Next Steps
+
+- [Usage](/docs/calendar/usage)
+- [API References](/docs/calendar/api-references)
